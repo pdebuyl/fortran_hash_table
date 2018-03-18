@@ -24,6 +24,8 @@ function.
 
 **License:** BSD
 
+**Code repository:** [https://github.com/pdebuyl/fortran_hash_table/](https://github.com/pdebuyl/fortran_hash_table/)
+
 ## Project goals
 
 - Demonstrate a hash table in Fortran.
