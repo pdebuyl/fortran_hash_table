@@ -1,6 +1,11 @@
 language: c
 dist: trusty
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+
 deploy:
   provider: pages
   skip-cleanup: true
@@ -17,19 +22,20 @@ cache:
 addons:
   apt:
     packages:
-      - gfortran
+      - gfortran-6
       - binutils
       - lcov
       - doxygen
 
 install:
   - mkdir build && cd build
+  - export FC=gfortran-6
   - cmake .. -DCMAKE_Fortran_FLAGS='--coverage' -DWITH_DOXYGEN=ON
   - make VERBOSE=1
   - make test
   - make doc
   - lcov -c -d . -o fht_coverage.info
-  - genhtml fht_coverage.info --output-directory doc/fht_coverage
+  - genhtml fht_coverage.info --output-directory doc/html/coverage
 
 script:
   - ctest -V
