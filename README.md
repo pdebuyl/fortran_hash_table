@@ -51,6 +51,8 @@ easily.
 `dictionary_m` consists of a single Fortran file. You can just drop `src/dictionary_m.f90`
 in your Fortran project.
 
+The code requires Fortran 2008 support. For gfortran, we have tested version 6.3 and 7.2.
+
 ## Coverage
 
 If you read this page from the "GitHub pages" website, you can access the coverage data

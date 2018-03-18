@@ -4,7 +4,7 @@ dist: trusty
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test # needed for gfortran-6
     packages:
       - gfortran-6
       - binutils
