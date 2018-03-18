@@ -5,6 +5,11 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+    packages:
+      - gfortran-6
+      - binutils
+      - lcov
+      - doxygen
 
 deploy:
   provider: pages
@@ -18,14 +23,6 @@ sudo: false
 
 cache:
   apt: true
-
-addons:
-  apt:
-    packages:
-      - gfortran-6
-      - binutils
-      - lcov
-      - doxygen
 
 install:
   - mkdir build && cd build
