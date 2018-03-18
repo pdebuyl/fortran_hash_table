@@ -32,7 +32,7 @@ install:
   - make test
   - make doc
   - lcov -c -d . -o fht_coverage.info
-  - genhtml fht_coverage.info --output-directory doc/html/coverage
+  - genhtml fht_coverage.info --output-directory doc/coverage
 
 script:
   - ctest -V
