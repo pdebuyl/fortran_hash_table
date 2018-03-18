@@ -51,3 +51,7 @@ easily.
 `dictionary_m` consists of a single Fortran file. You can just drop `src/dictionary_m.f90`
 in your Fortran project.
 
+## Coverage
+
+If you read this page from the "GitHub pages" website, you can access the coverage data
+generated from lcov [here](coverage/index.html).
