@@ -53,7 +53,10 @@ in your Fortran project.
 
 The code requires Fortran 2008 support. For gfortran, we have tested version 6.3 and 7.2.
 
-## Coverage
+## Documentation and coverage
+
+The Doxygen-generated documentation is available at
+[https://pdebuyl.github.io/fortran_hash_table/index.html](https://pdebuyl.github.io/fortran_hash_table/index.html)
 
 If you read this page from the "GitHub pages" website, you can access the coverage data
 generated from lcov [here](coverage/index.html).
