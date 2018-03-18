@@ -3,10 +3,15 @@ cmake_minimum_required(VERSION 2.6)
 Project(fortran_project Fortran)
 
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
+enable_testing()
 
-add_executable(read_write test/read_write.f90 src/dictionary_m.f90)
+add_library(dictionary_m src/dictionary_m.f90)
 
-add_executable(example_from_readme test/example_from_readme.f90 src/dictionary_m.f90)
+foreach(test_name read_write example_from_readme)
+add_executable(${test_name} test/${test_name}.f90)
+target_link_libraries(${test_name} dictionary_m)
+add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach(test_name)
 
 option(WITH_DOXYGEN OFF)
 
