@@ -1,3 +1,6 @@
+!> \file dictionary_m.f90
+!! \brief Module file for dictionary_t
+
 !> Dictionary type that uses strings for the keys and values
 !!
 !! Design:

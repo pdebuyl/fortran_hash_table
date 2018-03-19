@@ -1,3 +1,7 @@
+!> \file example_from_readme.f90
+!! \brief Very short example to demonstrate the syntax of the dictionary_t object
+
+!> Define a dictionary_t object, use the set and get methods.
 program example_from_readme
   use dictionary_m
   implicit none

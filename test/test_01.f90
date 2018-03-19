@@ -1,3 +1,12 @@
+!> \file test_01.f90
+!! \brief Test program for dictionary_m
+
+!> Define a dictionary_t object, populate it with keys and values, and list the results with
+!! the show method. This program also:
+!! - requests a non-existing key
+!! - write several keys in the same bucket, hence testing reallocation of the bucket
+!! - rewrites an existing value
+
 program test_01
   use dictionary_m
   implicit none

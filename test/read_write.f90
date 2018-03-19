@@ -1,3 +1,14 @@
+!> \file read_write.f90
+!! \brief Using dictionary_t to store a configuration file
+
+!> Read a "equal sign" separated input file
+!!
+!! Usage:
+!!    ./read_write name_of_input_file
+!!
+!! Output: the program returns one line per key, with the key and the value separated by an
+!! equal sign.
+
 program use_ssdm
   use dictionary_m
   implicit none

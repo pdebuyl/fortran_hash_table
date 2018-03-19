@@ -57,8 +57,9 @@ The code requires Fortran 2008 support. For gfortran, we have tested version 6.3
 
 ## Documentation and coverage
 
-The Doxygen-generated documentation is available at
-[https://pdebuyl.github.io/fortran_hash_table/index.html](https://pdebuyl.github.io/fortran_hash_table/index.html)
+If you read this page from the "GitHub pages" doxygen-generated
+[documentation](https://pdebuyl.github.io/fortran_hash_table/), you can access:
 
-If you read this page from the "GitHub pages" website, you can access the coverage data
-generated from lcov [here](coverage/index.html).
+- The [module documentation](namespacedictionary__m.html)
+- The [list of files and test programs](files.html)
+- The [coverage data](coverage/index.html) generated from lcov and genhtml.
