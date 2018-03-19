@@ -1,0 +1,9 @@
+
+key = value
+unusal characters = æßđðĸĸǽsldkf
+lines with no equal sign
+
+1 = one
+
+square root of two = 1.4142135623730951
+

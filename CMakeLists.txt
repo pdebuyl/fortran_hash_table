@@ -18,6 +18,8 @@ target_link_libraries(${test_name} dictionary_m)
 add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach(test_name)
 
+file(COPY test/input_dict.txt DESTINATION ${CMAKE_BINARY_DIR})
+
 option(WITH_DOXYGEN OFF)
 
 if(WITH_DOXYGEN)
