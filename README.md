@@ -39,7 +39,7 @@ function.
 
 
 The hash table is based on plain allocatable arrays and the base data is stored in `(len=:),
-allocatable` character variables. Buckets are extended arbitrarily but reallocating, thus
+allocatable` character variables. Buckets are extended arbitrarily by reallocation, thus
 collisions will slow down this implementation with respect to others using better data
 structures.
 
