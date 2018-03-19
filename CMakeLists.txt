@@ -12,6 +12,8 @@ add_executable(${test_name} test/${test_name}.f90)
 target_link_libraries(${test_name} dictionary_m)
 endforeach(test_name)
 
+add_test(NAME read_write COMMAND read_write input_dict.txt)
+
 foreach(test_name example_from_readme test_01)
 add_executable(${test_name} test/${test_name}.f90)
 target_link_libraries(${test_name} dictionary_m)
