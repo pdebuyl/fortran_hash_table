@@ -53,7 +53,8 @@ easily.
 `dictionary_m` consists of a single Fortran file. You can just drop `src/dictionary_m.f90`
 in your Fortran project.
 
-The code requires Fortran 2008 support. For gfortran, we have tested version 6.3 and 7.2.
+The code requires Fortran 2008 support. For gfortran, I have tested version 6.3 and 7.2. For
+Intel Fortran, I have tested version 16.0.3.
 
 ## Documentation and coverage
 
@@ -63,3 +64,13 @@ If you read this page from the "GitHub pages" doxygen-generated
 - The documentation of the module `dictionary_m`.
 - The [list of files and test programs](files.html)
 - The [coverage data](coverage/index.html) generated from lcov and genhtml.
+
+## See also
+
+I am neither the first or the only person having implemented a hash table in Fortran. While
+the implementations below did not fit my design goals, they might suit you just fine.
+
+- [HASTY](https://github.com/szaghi/HASTY) by Stefano Zaghi: *HASh Table fortran container exploting coarraY*.
+- In [FLIBS](http://flibs.sourceforge.net/) by Arjen Markus, `dictionaries` is a *Generic
+  source code for implementing a mapping of strings to data.*
+- The Fortran Wiki has a [page on hash tables](http://fortranwiki.org/fortran/show/Hash+tables).
