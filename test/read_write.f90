@@ -4,7 +4,10 @@
 !> Read a "equal sign" separated input file
 !!
 !! Usage:
-!!    ./read_write name_of_input_file
+!!    ./read_write name_of_input_file [dict_size]
+!!
+!! dict_size is an optional integer argument that sets the size of the hash table. The
+!! default value is 1024.
 !!
 !! Output: the program returns one line per key, with the key and the value separated by an
 !! equal sign.
@@ -16,7 +19,7 @@ program use_ssdm
   type(dictionary_t) :: b
   character(len=128) :: line
   character(len=:), allocatable :: k, v, fname
-  integer :: iostat, eq_location, funit
+  integer :: iostat, eq_location, funit, dict_size
 
   if (command_argument_count() < 1) then
      stop 'missing argument for parameter file'
@@ -25,7 +28,14 @@ program use_ssdm
   call get_command_argument(1, line)
   fname = trim(adjustl(line))
 
-  call b%init(512)
+  if (command_argument_count() < 2) then
+     dict_size = 1024
+  else
+     call get_command_argument(2, line)
+     read(line, *) dict_size
+  end if
+
+  call b%init(dict_size)
 
   open(file=fname, newunit=funit)
   read_loop: do
