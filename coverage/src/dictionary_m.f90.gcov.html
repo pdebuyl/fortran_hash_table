@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fht_coverage.info - src/dictionary_m.f90</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - dictionary_m.f90<span style="font-size: 80%;"> (source / <a href="dictionary_m.f90.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fht_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2018-03-20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">70.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : !&gt; \file dictionary_m.f90</a>
+<span class="lineNum">       2 </span>            : !! \brief Module file for dictionary_t
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : !&gt; Dictionary type that uses strings for the keys and values
+<span class="lineNum">       5 </span>            : !!
+<span class="lineNum">       6 </span>            : !! Design:
+<span class="lineNum">       7 </span>            : !!  - djb2 hash function (D. J. Bernstein, see http://www.cse.yorku.ca/~oz/hash.html)
+<span class="lineNum">       8 </span>            : !!  - The strings are all &quot;character(len=:), allocatable&quot; variables
+<span class="lineNum">       9 </span>            : !!  - There is no linked list nor pointers, only allocatable arrays for the dynamic data structure
+<span class="lineNum">      10 </span>            : !!  - set rewrites existing entries without complaining
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : module dictionary_m
+<span class="lineNum">      13 </span>            :   implicit none
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :   private
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   public :: dictionary_t
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :   !&gt; Single entry in the dictionary
+<span class="lineNum">      20 </span>            :   type entry_t
+<span class="lineNum">      21 </span>            :      character(len=:), allocatable :: key
+<span class="lineNum">      22 </span>            :      character(len=:), allocatable :: value
+<span class="lineNum">      23 </span>            :   end type entry_t
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   !&gt; A bucket contains several entries
+<span class="lineNum">      26 </span>            :   type bucket_t
+<span class="lineNum">      27 </span>            :      type(entry_t), allocatable :: entries(:)
+<span class="lineNum">      28 </span>            :      integer :: current_size = 0
+<span class="lineNum">      29 </span>            :      integer :: current_idx = 0
+<span class="lineNum">      30 </span>            :    contains
+<span class="lineNum">      31 </span>            :      procedure :: find
+<span class="lineNum">      32 </span>            :   end type bucket_t
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :   !&gt; The dictionary contains dict_size buckets (defined at run time)
+<span class="lineNum">      35 </span>            :   type dictionary_t
+<span class="lineNum">      36 </span>            :      type(bucket_t), allocatable :: buckets(:)
+<span class="lineNum">      37 </span>            :      integer :: dict_size = 0
+<span class="lineNum">      38 </span>            :    contains
+<span class="lineNum">      39 </span>            :      procedure :: djb2
+<span class="lineNum">      40 </span>            :      procedure :: set
+<span class="lineNum">      41 </span>            :      procedure :: get
+<span class="lineNum">      42 </span>            :      procedure :: init
+<span class="lineNum">      43 </span>            :      procedure :: show
+<span class="lineNum">      44 </span>            :   end type dictionary_t
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :   integer, parameter :: BUCKET_EMPTY = -2
+<span class="lineNum">      47 </span>            :   integer, parameter :: BUCKET_ENTRY_NOT_FOUND = -4
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : contains
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :   !&gt; djb2 hash function
+<span class="lineNum">      52 </span>            :   !!
+<span class="lineNum">      53 </span>            :   !! \param this the dictionary_t object
+<span class="lineNum">      54 </span>            :   !! \param s a string
+<a name="55"><span class="lineNum">      55 </span>            :   !!</a>
+<span class="lineNum">      56 </span>            :   !! \return the hash value between 0 and dict_size-1
+<span class="lineNum">      57 </span><span class="lineCov">         19 :   function djb2(this, s) result(r)</span>
+<span class="lineNum">      58 </span>            :     class(dictionary_t), intent(in) :: this
+<span class="lineNum">      59 </span>            :     character(len=*), intent(in) :: s
+<span class="lineNum">      60 </span>            :     integer :: r
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :     integer :: i, l
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">         19 :     l = len(s)</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">         19 :     r = 5381</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">         97 :     do i = 1, l</span>
+<span class="lineNum">      69 </span><span class="lineCov">         78 :        r = r*33 + ichar(s(i:i))</span>
+<span class="lineNum">      70 </span>            :     end do
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">         19 :     r = modulo(r, this%dict_size)</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">         38 :   end function djb2</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   !&gt; Add or replace an entry in the dictionary
+<span class="lineNum">      77 </span>            :   !!
+<span class="lineNum">      78 </span>            :   !! \param this the dictionary_t object
+<a name="79"><span class="lineNum">      79 </span>            :   !! \param k the key</a>
+<span class="lineNum">      80 </span>            :   !! \param v the value
+<span class="lineNum">      81 </span><span class="lineCov">         13 :   subroutine set(this, k, v)</span>
+<span class="lineNum">      82 </span>            :     class(dictionary_t), intent(inout) :: this
+<span class="lineNum">      83 </span>            :     character(len=*), intent(in) :: k
+<span class="lineNum">      84 </span>            :     character(len=*), intent(in) :: v
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">         13 :     type(bucket_t) :: tmp_bucket</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     integer :: h, i, b_idx
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         13 :     h = this%djb2(k) + 1</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">         13 :     b_idx = this%buckets(h)%find(k)</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         13 :     if (b_idx == BUCKET_EMPTY) then</span>
+<span class="lineNum">      95 </span>            :        ! allocate bucket for 1 entry
+<span class="lineNum">      96 </span>            :        ! also, means we can take the first entry
+<span class="lineNum">      97 </span><span class="lineCov">         11 :        allocate(this%buckets(h)%entries(1))</span>
+<span class="lineNum">      98 </span><span class="lineCov">         11 :        this%buckets(h)%current_size = 1</span>
+<span class="lineNum">      99 </span><span class="lineCov">         11 :        this%buckets(h)%current_idx = 1</span>
+<span class="lineNum">     100 </span><span class="lineCov">         11 :        b_idx = 1</span>
+<span class="lineNum">     101 </span><span class="lineCov">         11 :        this%buckets(h)%entries(1)%key = trim(k)</span>
+<span class="lineNum">     102 </span><span class="lineCov">         11 :        this%buckets(h)%entries(1)%value = trim(v)</span>
+<span class="lineNum">     103 </span>            :        ! the values are registered, exit
+<span class="lineNum">     104 </span><span class="lineCov">         11 :        return</span>
+<span class="lineNum">     105 </span>            :     end if
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          2 :     if (b_idx == BUCKET_ENTRY_NOT_FOUND) then</span>
+<span class="lineNum">     108 </span>            :        ! copy and grow bucket entries
+<span class="lineNum">     109 </span>            :        
+<span class="lineNum">     110 </span><span class="lineCov">          1 :        allocate(tmp_bucket%entries(this%buckets(h)%current_size + 1))</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :        tmp_bucket%current_size = this%buckets(h)%current_size + 1</span>
+<span class="lineNum">     112 </span><span class="lineCov">          1 :        tmp_bucket%current_idx = this%buckets(h)%current_idx + 1</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">          2 :        do i = 1, this%buckets(h)%current_size</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :           tmp_bucket%entries(i)%key = this%buckets(h)%entries(i)%key</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :           tmp_bucket%entries(i)%value = this%buckets(h)%entries(i)%value</span>
+<span class="lineNum">     117 </span>            :        end do
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">          1 :        deallocate(this%buckets(h)%entries)</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :        allocate(this%buckets(h)%entries, source=tmp_bucket%entries)</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :        deallocate(tmp_bucket%entries)</span>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">          1 :        this%buckets(h)%current_size = tmp_bucket%current_size</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :        this%buckets(h)%current_idx = tmp_bucket%current_idx</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :        b_idx = this%buckets(h)%current_idx</span>
+<span class="lineNum">     126 </span>            :     end if
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          2 :     if (b_idx &gt; 0) then</span>
+<span class="lineNum">     129 </span><span class="lineCov">          2 :        this%buckets(h)%entries(b_idx)%key = k</span>
+<span class="lineNum">     130 </span><span class="lineCov">          2 :        this%buckets(h)%entries(b_idx)%value = v</span>
+<span class="lineNum">     131 </span>            :     end if
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">         26 :   end subroutine set</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :   !&gt; Initialize a dictionary object
+<span class="lineNum">     136 </span>            :   !!
+<a name="137"><span class="lineNum">     137 </span>            :   !! \param this the dictionary_t object</a>
+<span class="lineNum">     138 </span>            :   !! \param dict_size the size of the hash table
+<span class="lineNum">     139 </span><span class="lineCov">          3 :   subroutine init(this, dict_size)</span>
+<span class="lineNum">     140 </span>            :     class(dictionary_t), intent(out) :: this
+<span class="lineNum">     141 </span>            :     integer, intent(in) :: dict_size
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">          3 :     allocate(this%buckets(dict_size))</span>
+<span class="lineNum">     144 </span><span class="lineCov">          3 :     this%dict_size = dict_size</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          3 :   end subroutine init</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :   !&gt; Display the content of a dictionary
+<a name="149"><span class="lineNum">     149 </span>            :   !!</a>
+<span class="lineNum">     150 </span>            :   !! \param this the dictionary_t object
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   subroutine show(this)</span>
+<span class="lineNum">     152 </span>            :     class(dictionary_t), intent(in) :: this
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     integer :: i, j, s
+<span class="lineNum">     155 </span>            :     integer :: n
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">          1 :     n = 0</span>
+<span class="lineNum">     158 </span><span class="lineCov">         11 :     do i = 1, this%dict_size</span>
+<span class="lineNum">     159 </span><span class="lineCov">         10 :        s = this%buckets(i)%current_idx</span>
+<span class="lineNum">     160 </span><span class="lineCov">         10 :        if (s &gt; 0) then</span>
+<span class="lineNum">     161 </span><span class="lineCov">          5 :              write(*,*) 'bucket   : ', i, ' size ', s</span>
+<span class="lineNum">     162 </span><span class="lineCov">         11 :           do j = 1, s</span>
+<span class="lineNum">     163 </span><span class="lineCov">          6 :              write(*,*) 'key      : ', this%buckets(i)%entries(j)%key</span>
+<span class="lineNum">     164 </span><span class="lineCov">          6 :              write(*,*) 'value    : ', this%buckets(i)%entries(j)%value</span>
+<span class="lineNum">     165 </span>            :           end do
+<span class="lineNum">     166 </span>            :        end if
+<span class="lineNum">     167 </span>            :     end do
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">          1 :   end subroutine show</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   !&gt; Find the &quot;in-bucket&quot; index for a given key
+<span class="lineNum">     172 </span>            :   !!
+<span class="lineNum">     173 </span>            :   !! Negative return values correspond to module-defined return codes.
+<span class="lineNum">     174 </span>            :   !!
+<span class="lineNum">     175 </span>            :   !! \param this the bucket_t object
+<span class="lineNum">     176 </span>            :   !! \param k the key
+<a name="177"><span class="lineNum">     177 </span>            :   !!</a>
+<span class="lineNum">     178 </span>            :   !! \return the index (1-based) of the key in the bucket or a return code
+<span class="lineNum">     179 </span><span class="lineCov">         19 :   function find(this, k) result(r)</span>
+<span class="lineNum">     180 </span>            :     class(bucket_t), intent(in) :: this
+<span class="lineNum">     181 </span>            :     character(len=*), intent(in) :: k
+<span class="lineNum">     182 </span>            :     integer :: r
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :     integer :: i
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">         19 :     if (this%current_size == 0) then</span>
+<span class="lineNum">     187 </span><span class="lineCov">         12 :        r = BUCKET_EMPTY</span>
+<span class="lineNum">     188 </span><span class="lineCov">         12 :        return</span>
+<span class="lineNum">     189 </span>            :     end if
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">          7 :     r = BUCKET_ENTRY_NOT_FOUND</span>
+<span class="lineNum">     192 </span><span class="lineCov">          8 :     do i = 1, this%current_size</span>
+<span class="lineNum">     193 </span><span class="lineCov">          7 :        if (this%entries(i)%key == trim(k)) then</span>
+<span class="lineNum">     194 </span><span class="lineCov">          6 :           r = i</span>
+<span class="lineNum">     195 </span><span class="lineCov">          6 :           exit</span>
+<span class="lineNum">     196 </span>            :        end if
+<span class="lineNum">     197 </span>            :     end do
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">         26 :   end function find</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :   !&gt; Fetch an entry in the dictionary.
+<span class="lineNum">     202 </span>            :   !!
+<span class="lineNum">     203 </span>            :   !! \param this the dictionary_t object
+<span class="lineNum">     204 </span>            :   !! \param k the key
+<a name="205"><span class="lineNum">     205 </span>            :   !!</a>
+<span class="lineNum">     206 </span>            :   !! \return the value if found, an empty string else
+<span class="lineNum">     207 </span><span class="lineCov">         12 :   function get(this, k) result(r)</span>
+<span class="lineNum">     208 </span>            :     class(dictionary_t), intent(in) :: this
+<span class="lineNum">     209 </span>            :     character(len=*), intent(in) :: k
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :     character(len=:), allocatable :: r
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :     integer :: h, b_idx
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineCov">          6 :     h = this%djb2(k) + 1</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">          6 :     b_idx = this%buckets(h)%find(k)</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">          6 :     if ( (b_idx == BUCKET_EMPTY) .or. &amp;</span>
+<span class="lineNum">     220 </span>            :          (b_idx == BUCKET_ENTRY_NOT_FOUND) ) then
+<span class="lineNum">     221 </span><span class="lineCov">          1 :        r = ''</span>
+<span class="lineNum">     222 </span><span class="lineCov">          1 :        return</span>
+<span class="lineNum">     223 </span>            :     end if
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">          5 :     if (b_idx&gt;0) then</span>
+<span class="lineNum">     226 </span><span class="lineCov">          5 :        r = this%buckets(h)%entries(b_idx)%value</span>
+<span class="lineNum">     227 </span>            :     end if
+<span class="lineNum">     228 </span>            : 
+<a name="229"><span class="lineNum">     229 </span><span class="lineCov">         12 :   end function get</span></a>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">          3 : end module dictionary_m</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
